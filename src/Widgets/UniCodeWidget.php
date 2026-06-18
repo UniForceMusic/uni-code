@@ -13,7 +13,6 @@ use PhpTui\Tui\Extension\Core\Widget\GridWidget;
 use PhpTui\Tui\Extension\Core\Widget\ParagraphWidget;
 use PhpTui\Tui\Layout\Constraint;
 use PhpTui\Tui\Text\Text;
-use PhpTui\Tui\Text\Title;
 use PhpTui\Tui\Widget\Borders;
 use PhpTui\Tui\Widget\BorderType;
 use PhpTui\Tui\Widget\Direction;
@@ -21,20 +20,22 @@ use PhpTui\Tui\Widget\Widget;
 
 class UniCodeWidget implements WidgetInterface
 {
-    protected PromptWidget $promptWidget;
+    protected SessionWidget $sessionWidget;
 
     public function __construct(
         protected Terminal $terminal
     ) {
-        $this->promptWidget = new PromptWidget($terminal);
+        $this->sessionWidget = new SessionWidget($terminal);
     }
 
     public function toWidget(?Event $event): Widget
     {
         return GridWidget::default()
+            ->direction(Direction::Vertical)
             ->constraints(
-                Constraint::percentage(10),
+                Constraint::percentage(5),
                 Constraint::percentage(90),
+                Constraint::percentage(5),
             )
             ->widgets(
                 ParagraphWidget::fromText(Text::parse(PHP_EOL)),
@@ -46,12 +47,11 @@ class UniCodeWidget implements WidgetInterface
                     )
                     ->widgets(
                         BlockWidget::default()
-                            ->padding(Padding::all(2))
+                            ->padding(Padding::horizontal(1))
                             ->borders(Borders::ALL)
                             ->borderType(BorderType::Rounded)
-                            ->widget($this->promptWidget->toWidget($event)),
+                            ->widget($this->sessionWidget->toWidget($event)),
                         BlockWidget::default()
-                            ->padding(Padding::all(2))
                             ->borders(Borders::ALL)
                             ->borderType(BorderType::Rounded)
                             ->widget(
@@ -60,7 +60,8 @@ class UniCodeWidget implements WidgetInterface
                                         MapShape::default()->resolution(MapResolution::High)
                                     ),
                             ),
-                    )
+                    ),
+                ParagraphWidget::fromText(Text::parse(PHP_EOL))
             );
     }
 }
