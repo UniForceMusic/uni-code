@@ -1,0 +1,18 @@
+{
+    "name": "uniforcemusic/uni-code",
+    "description": "A PHP powered AI code terminal application",
+    "authors": [
+        {
+            "name": "uniforcemusic"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Src\\": "src"
+        }
+    },
+    "require": {
+        "php": "^8.4",
+        "php-tui/php-tui": "^0.2.1"
+    }
+}
