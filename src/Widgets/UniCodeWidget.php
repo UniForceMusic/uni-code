@@ -23,9 +23,8 @@ class UniCodeWidget implements WidgetInterface
     protected SessionWidget $sessionWidget;
 
     public function __construct(
-        protected Terminal $terminal
     ) {
-        $this->sessionWidget = new SessionWidget($terminal);
+        $this->sessionWidget = new SessionWidget();
     }
 
     public function toWidget(?Event $event): Widget

@@ -2,6 +2,7 @@
 
 namespace Src\Widgets;
 
+use Closure;
 use PhpTui\Term\Event;
 use PhpTui\Term\Event\CharKeyEvent;
 use PhpTui\Term\Event\CodedKeyEvent;
@@ -11,13 +12,14 @@ use PhpTui\Term\Terminal;
 use PhpTui\Tui\Extension\Core\Widget\ParagraphWidget;
 use PhpTui\Tui\Text\Text;
 use PhpTui\Tui\Widget\Widget;
+use Src\Author;
 
 class PromptWidget implements WidgetInterface
 {
     protected string $prompt = '';
 
     public function __construct(
-        protected Terminal $terminal
+        protected Closure $executePrompt
     ) {
     }
 
@@ -34,10 +36,22 @@ class PromptWidget implements WidgetInterface
             if ($event->code === KeyCode::Backspace) {
                 $this->prompt = substr($this->prompt, 0, -1);
             }
+
+            if ($event->code === KeyCode::Enter) {
+                ($this->executePrompt)(Author::User, $this->prompt);
+
+                $this->prompt = '';
+            }
         }
 
         return ParagraphWidget::fromText(
-            Text::parse("<fg=blue>$this->prompt</>")
+            Text::parse(
+                sprintf(
+                    '<fg=%s>%s</>',
+                    Author::User->color(),
+                    $this->prompt
+                )
+            )
         );
     }
 }

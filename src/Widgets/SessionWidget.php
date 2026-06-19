@@ -2,6 +2,7 @@
 
 namespace Src\Widgets;
 
+use Closure;
 use PhpTui\Term\Event;
 use PhpTui\Term\Terminal;
 use PhpTui\Tui\Extension\Core\Widget\Block\Padding;
@@ -12,17 +13,31 @@ use PhpTui\Tui\Widget\Borders;
 use PhpTui\Tui\Widget\BorderType;
 use PhpTui\Tui\Widget\Direction;
 use PhpTui\Tui\Widget\Widget;
+use Src\Author;
+use Src\State\ArrayState;
 
 class SessionWidget implements WidgetInterface
 {
+    protected ArrayState $messages;
+
     protected ChatWidget $sessionWidget;
     protected PromptWidget $promptWidget;
 
     public function __construct(
-        protected Terminal $terminal
     ) {
-        $this->sessionWidget = new ChatWidget($terminal);
-        $this->promptWidget = new PromptWidget($terminal);
+        $this->messages = new ArrayState([]);
+
+        $this->sessionWidget = new ChatWidget($this->messages);
+        $this->promptWidget = new PromptWidget(
+            executePrompt: function (Author $author, string $prompt): void {
+                $messages = $this->messages->get();
+
+                array_push($messages, new MessageWidget($author, $prompt));
+                array_push($messages, new MessageWidget(Author::Model, 'There is no model connected yet'));
+
+                $this->messages->set($messages);
+            }
+        );
     }
 
     public function toWidget(?Event $event): Widget

@@ -21,7 +21,7 @@ $terminal->flush();
 $display = DisplayBuilder::default()->build();
 $display->clear();
 
-$uniCode = new UniCodeWidget($terminal);
+$uniCode = new UniCodeWidget();
 
 while (true) {
     $event = $terminal->events()->next();

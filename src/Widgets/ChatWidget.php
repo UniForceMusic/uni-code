@@ -3,27 +3,16 @@
 namespace Src\Widgets;
 
 use PhpTui\Term\Event;
-use PhpTui\Term\Terminal;
 use PhpTui\Tui\Extension\Core\Widget\GridWidget;
-use PhpTui\Tui\Extension\Core\Widget\ParagraphWidget;
-use PhpTui\Tui\Extension\Core\Widget\ScrollbarWidget;
 use PhpTui\Tui\Layout\Constraint;
-use PhpTui\Tui\Text\Text;
 use PhpTui\Tui\Widget\Direction;
 use PhpTui\Tui\Widget\Widget;
+use Src\State\ArrayState;
 
 class ChatWidget implements WidgetInterface
 {
-    protected array $messages = [
-        '<fg=blue>User:</> Please do this',
-        '<fg=green>AI:</> Okay i will do it',
-        '<fg=blue>User:</> Please do this',
-        '<fg=green>AI:</> Okay i will do it',
-        '<fg=blue>User:</> Please do this',
-    ];
-
     public function __construct(
-        protected Terminal $terminal
+        protected ArrayState $messages
     ) {
     }
 
@@ -34,16 +23,14 @@ class ChatWidget implements WidgetInterface
             ->constraints(
                 ...array_map(
                     fn() => Constraint::percentage(10),
-                    $this->messages
+                    $this->messages->get()
                 )
 
             )
             ->widgets(
                 ...array_map(
-                    fn(string $message) => ParagraphWidget::fromText(
-                        Text::parse($message)
-                    ),
-                    $this->messages
+                    fn(WidgetInterface $widget) => $widget->toWidget($event),
+                    $this->messages->get()
                 )
             );
     }
