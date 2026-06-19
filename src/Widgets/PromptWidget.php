@@ -19,20 +19,25 @@ class PromptWidget implements WidgetInterface
     protected string $prompt = '';
 
     public function __construct(
+        protected Closure $draw,
         protected Closure $executePrompt
     ) {
     }
 
     public function toWidget(?Event $event): Widget
     {
-        if ($event instanceof CharKeyEvent) {
+        if ($event && $event instanceof CharKeyEvent) {
+            ($this->draw)();
+
             $char = $event->char;
             $uppercase = $event->modifiers === KeyModifiers::SHIFT;
 
             $this->prompt .= $uppercase ? strtoupper($char) : $char;
         }
 
-        if ($event instanceof CodedKeyEvent) {
+        if ($event && $event instanceof CodedKeyEvent) {
+            ($this->draw)();
+
             if ($event->code === KeyCode::Backspace) {
                 $this->prompt = substr($this->prompt, 0, -1);
             }

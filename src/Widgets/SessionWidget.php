@@ -24,11 +24,13 @@ class SessionWidget implements WidgetInterface
     protected PromptWidget $promptWidget;
 
     public function __construct(
+        protected Closure $draw
     ) {
         $this->messages = new ArrayState([]);
 
-        $this->sessionWidget = new ChatWidget($this->messages);
+        $this->sessionWidget = new ChatWidget($draw, $this->messages);
         $this->promptWidget = new PromptWidget(
+            $draw,
             executePrompt: function (Author $author, string $prompt): void {
                 $messages = $this->messages->get();
 
