@@ -13,6 +13,15 @@
     },
     "require": {
         "php": "^8.4",
-        "php-tui/php-tui": "^0.2.1"
+        "php-tui/php-tui": "^0.2.1",
+        "openai-php/client": "^0.20.0",
+        "symfony/http-client": "^8.1",
+        "nyholm/psr7": "^1.8",
+        "guzzlehttp/guzzle": "^7.12"
+    },
+    "config": {
+        "allow-plugins": {
+            "php-http/discovery": true
+        }
     }
 }

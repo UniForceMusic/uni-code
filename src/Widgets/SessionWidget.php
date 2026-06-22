@@ -14,11 +14,14 @@ use PhpTui\Tui\Widget\BorderType;
 use PhpTui\Tui\Widget\Direction;
 use PhpTui\Tui\Widget\Widget;
 use Src\Author;
+use Src\Messages\ModelMessage;
+use Src\Messages\UserMessage;
+use Src\Session;
 use Src\State\ArrayState;
 
 class SessionWidget implements WidgetInterface
 {
-    protected ArrayState $messages;
+    protected Session $session;
 
     protected ChatWidget $sessionWidget;
     protected PromptWidget $promptWidget;
@@ -26,18 +29,14 @@ class SessionWidget implements WidgetInterface
     public function __construct(
         protected Closure $draw
     ) {
-        $this->messages = new ArrayState([]);
+        $this->session = new Session();
 
-        $this->sessionWidget = new ChatWidget($draw, $this->messages);
+        $this->sessionWidget = new ChatWidget($draw, $this->session);
         $this->promptWidget = new PromptWidget(
             $draw,
             executePrompt: function (Author $author, string $prompt): void {
-                $messages = $this->messages->get();
-
-                array_push($messages, new MessageWidget($author, $prompt));
-                array_push($messages, new MessageWidget(Author::Model, 'There is no model connected yet'));
-
-                $this->messages->set($messages);
+                $this->session->appendMessage(new UserMessage($prompt));
+                $this->session->appendMessage(new ModelMessage($prompt, 'No system prompt yet'));
             }
         );
     }

@@ -8,42 +8,32 @@ use PhpTui\Tui\Extension\Core\Widget\GridWidget;
 use PhpTui\Tui\Layout\Constraint;
 use PhpTui\Tui\Widget\Direction;
 use PhpTui\Tui\Widget\Widget;
-use Src\State\ArrayState;
+use Src\Session;
 
 class ChatWidget implements WidgetInterface
 {
-    protected ?int $messagesCount = null;
-
     public function __construct(
         protected Closure $draw,
-        protected ArrayState $messages
+        protected Session $session
     ) {
-        if ($this->messagesCount === null) {
-            $this->messagesCount = count($messages->get());
-        }
     }
 
     public function toWidget(?Event $event): Widget
     {
-        if (count($this->messages->get()) !== $this->messagesCount) {
-            $this->messagesCount = count($this->messages->get());
-
-            ($this->draw)();
-        }
-
         return GridWidget::default()
             ->direction(Direction::Vertical)
             ->constraints(
-                ...array_map(
-                    fn() => Constraint::percentage(10),
-                    $this->messages->get()
+                ...array_fill(
+                    0,
+                    $this->session->getMessageCount(),
+                    Constraint::percentage(10),
                 )
 
             )
             ->widgets(
                 ...array_map(
                     fn(WidgetInterface $widget) => $widget->toWidget($event),
-                    $this->messages->get()
+                    $this->session->getMesssageWidgets($this->draw)
                 )
             );
     }

@@ -4,7 +4,6 @@ namespace Src\Widgets;
 
 use Closure;
 use PhpTui\Term\Event;
-use PhpTui\Term\Terminal;
 use PhpTui\Tui\Extension\Core\Shape\MapResolution;
 use PhpTui\Tui\Extension\Core\Shape\MapShape;
 use PhpTui\Tui\Extension\Core\Widget\Block\Padding;
