@@ -3,8 +3,8 @@
 namespace Src\Widgets;
 
 use Closure;
+use OpenAI\Client;
 use PhpTui\Term\Event;
-use PhpTui\Term\Terminal;
 use PhpTui\Tui\Extension\Core\Widget\Block\Padding;
 use PhpTui\Tui\Extension\Core\Widget\BlockWidget;
 use PhpTui\Tui\Extension\Core\Widget\GridWidget;
@@ -17,7 +17,6 @@ use Src\Author;
 use Src\Messages\ModelMessage;
 use Src\Messages\UserMessage;
 use Src\Session;
-use Src\State\ArrayState;
 
 class SessionWidget implements WidgetInterface
 {
@@ -27,16 +26,17 @@ class SessionWidget implements WidgetInterface
     protected PromptWidget $promptWidget;
 
     public function __construct(
-        protected Closure $draw
+        protected Closure $draw,
+        Client $client
     ) {
         $this->session = new Session();
 
         $this->sessionWidget = new ChatWidget($draw, $this->session);
         $this->promptWidget = new PromptWidget(
             $draw,
-            executePrompt: function (Author $author, string $prompt): void {
+            executePrompt: function (Author $author, string $prompt) use ($client): void {
                 $this->session->appendMessage(new UserMessage($prompt));
-                $this->session->appendMessage(new ModelMessage($prompt, 'No system prompt yet'));
+                $this->session->appendMessage(new ModelMessage($client, 'You are uni-code. A REALLY smart agent harnass', $prompt));
             }
         );
     }

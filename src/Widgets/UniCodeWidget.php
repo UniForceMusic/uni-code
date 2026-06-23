@@ -3,6 +3,7 @@
 namespace Src\Widgets;
 
 use Closure;
+use OpenAI\Client;
 use PhpTui\Term\Event;
 use PhpTui\Tui\Extension\Core\Shape\MapResolution;
 use PhpTui\Tui\Extension\Core\Shape\MapShape;
@@ -23,9 +24,10 @@ class UniCodeWidget implements WidgetInterface
     protected SessionWidget $sessionWidget;
 
     public function __construct(
-        protected Closure $draw
+        protected Closure $draw,
+        Client $client
     ) {
-        $this->sessionWidget = new SessionWidget($draw);
+        $this->sessionWidget = new SessionWidget($draw, $client);
     }
 
     public function toWidget(?Event $event): Widget

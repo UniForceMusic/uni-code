@@ -3,33 +3,22 @@
 namespace Src\Messages;
 
 use Closure;
-use GuzzleHttp\Client as GuzzleClient;
 use OpenAI;
 use OpenAI\Client;
 use OpenAI\Responses\StreamResponse;
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
 use Src\Author;
 
 class ModelMessage implements MessageInterface
 {
-    protected Client $client;
     protected ?StreamResponse $streamedResponse = null;
     protected bool $hasFinishedStreaming = false;
     protected string $content = '';
 
     public function __construct(
+        protected Client $client,
+        protected string $systemPrompt,
         protected string $prompt,
-        protected ?string $systemPrompt
     ) {
-        $httpClient = new GuzzleClient([]);
-
-        $this->client = OpenAI::factory()
-            ->withApiKey('abcdefgh12345678')
-            ->withBaseUri('http://localhost:1234/v1')
-            ->withHttpClient($httpClient)
-            ->withStreamHandler(fn(RequestInterface $request): ResponseInterface => $httpClient->send($request, ['stream' => true]))
-            ->make();
     }
 
     public function getAuthor(): Author
@@ -41,8 +30,10 @@ class ModelMessage implements MessageInterface
     {
         if (!$this->streamedResponse) {
             $this->streamedResponse = $this->client->chat()->createStreamed([
-                'model' => 'granite-4.1-8b',
+                // 'model' => 'granite-4.1-8b',
+                'model' => 'qwen3.6-35b-a3b-mtp',
                 'messages' => [
+                    ['role' => 'system', 'content' => $this->systemPrompt],
                     ['role' => 'user', 'content' => $this->prompt],
                 ]
             ]);

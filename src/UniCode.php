@@ -2,6 +2,7 @@
 
 namespace Src;
 
+use OpenAI;
 use PhpTui\Term\Event;
 use PhpTui\Term\Event\CharKeyEvent;
 use PhpTui\Term\Event\CodedKeyEvent;
@@ -9,6 +10,8 @@ use PhpTui\Term\KeyCode;
 use PhpTui\Term\KeyModifiers;
 use PhpTui\Term\Terminal;
 use PhpTui\Tui\Display\Display;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 use Src\Widgets\UniCodeWidget;
 
 class UniCode
@@ -34,7 +37,16 @@ class UniCode
     {
         $usleep = (int) (1000000 / $fps);
 
-        $uniCodeWidget = new UniCodeWidget(fn() => $this->queueDraw());
+        $httpClient = new \GuzzleHttp\Client([]);
+
+        $client = OpenAI::factory()
+            ->withApiKey('abcdefgh12345678')
+            ->withBaseUri('http://localhost:1234/v1')
+            ->withHttpClient($httpClient)
+            ->withStreamHandler(fn(RequestInterface $request): ResponseInterface => $httpClient->send($request, ['stream' => true]))
+            ->make();
+
+        $uniCodeWidget = new UniCodeWidget(fn() => $this->queueDraw(), $client);
 
         while (true) {
             $event = $this->terminal->events()->next();
