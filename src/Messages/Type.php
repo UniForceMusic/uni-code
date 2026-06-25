@@ -1,18 +1,20 @@
 <?php
 
-namespace Src;
+namespace Src\Messages;
 
-enum Author: string
+enum Type: string
 {
+    case System = 'system';
     case User = 'user';
-    case Model = 'model';
+    case Assistant = 'assistant';
     case Tool = 'tool';
 
     public function color(): string
     {
         return match ($this) {
+            self::System => 'white',
             self::User => 'blue',
-            self::Model => 'green',
+            self::Assistant => 'green',
             self::Tool => 'yellow'
         };
     }

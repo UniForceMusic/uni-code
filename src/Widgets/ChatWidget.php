@@ -25,7 +25,7 @@ class ChatWidget implements WidgetInterface
             ->constraints(
                 ...array_fill(
                     0,
-                    $this->session->getMessageCount(),
+                    $this->session->getMessageCount() - 1,
                     Constraint::percentage(10),
                 )
 
@@ -33,7 +33,7 @@ class ChatWidget implements WidgetInterface
             ->widgets(
                 ...array_map(
                     fn(WidgetInterface $widget) => $widget->toWidget($event),
-                    $this->session->getMesssageWidgets($this->draw)
+                    array_slice($this->session->getMesssageWidgets($this->draw), 1)
                 )
             );
     }

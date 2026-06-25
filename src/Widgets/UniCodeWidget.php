@@ -18,6 +18,7 @@ use PhpTui\Tui\Widget\Borders;
 use PhpTui\Tui\Widget\BorderType;
 use PhpTui\Tui\Widget\Direction;
 use PhpTui\Tui\Widget\Widget;
+use Src\Apis\Wrappers\WrapperInterface;
 
 class UniCodeWidget implements WidgetInterface
 {
@@ -25,9 +26,9 @@ class UniCodeWidget implements WidgetInterface
 
     public function __construct(
         protected Closure $draw,
-        Client $client
+        WrapperInterface $wrapper
     ) {
-        $this->sessionWidget = new SessionWidget($draw, $client);
+        $this->sessionWidget = new SessionWidget($draw, $wrapper);
     }
 
     public function toWidget(?Event $event): Widget

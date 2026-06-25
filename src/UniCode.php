@@ -2,7 +2,6 @@
 
 namespace Src;
 
-use OpenAI;
 use PhpTui\Term\Event;
 use PhpTui\Term\Event\CharKeyEvent;
 use PhpTui\Term\Event\CodedKeyEvent;
@@ -10,12 +9,13 @@ use PhpTui\Term\KeyCode;
 use PhpTui\Term\KeyModifiers;
 use PhpTui\Term\Terminal;
 use PhpTui\Tui\Display\Display;
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
+use Src\Apis\Wrappers\OpenAIWrapper;
 use Src\Widgets\UniCodeWidget;
 
 class UniCode
 {
+    public const string SYSTEM_PROMPT = 'You are Uni-Code, an agent harness built by UniForceMusic. Your job is being an expert at coding';
+
     protected int $remainingDraws = 1;
 
     public static function fromPhpTui(Terminal $terminal, Display $display): static
@@ -37,16 +37,9 @@ class UniCode
     {
         $usleep = (int) (1000000 / $fps);
 
-        $httpClient = new \GuzzleHttp\Client([]);
+        $wrapper = new OpenAIWrapper('http://localhost:1234/v1', 'abcdefgh12345678');
 
-        $client = OpenAI::factory()
-            ->withApiKey('abcdefgh12345678')
-            ->withBaseUri('http://localhost:1234/v1')
-            ->withHttpClient($httpClient)
-            ->withStreamHandler(fn(RequestInterface $request): ResponseInterface => $httpClient->send($request, ['stream' => true]))
-            ->make();
-
-        $uniCodeWidget = new UniCodeWidget(fn() => $this->queueDraw(), $client);
+        $uniCodeWidget = new UniCodeWidget(fn() => $this->queueDraw(), $wrapper);
 
         while (true) {
             $event = $this->terminal->events()->next();

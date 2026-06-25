@@ -4,7 +4,7 @@ namespace Src\Messages;
 
 use Closure;
 
-class UserMessage implements MessageInterface
+class SystemMessage implements MessageInterface
 {
     public function __construct(
         protected string $content,
@@ -13,7 +13,7 @@ class UserMessage implements MessageInterface
 
     public function getType(): Type
     {
-        return Type::User;
+        return Type::System;
     }
 
     public function getContent(?Closure $draw = null): string

@@ -3,7 +3,6 @@
 namespace Src\Widgets;
 
 use Closure;
-use OpenAI\Client;
 use PhpTui\Term\Event;
 use PhpTui\Tui\Extension\Core\Widget\Block\Padding;
 use PhpTui\Tui\Extension\Core\Widget\BlockWidget;
@@ -13,8 +12,9 @@ use PhpTui\Tui\Widget\Borders;
 use PhpTui\Tui\Widget\BorderType;
 use PhpTui\Tui\Widget\Direction;
 use PhpTui\Tui\Widget\Widget;
-use Src\Author;
-use Src\Messages\ModelMessage;
+use Src\Apis\Wrappers\WrapperInterface;
+use Src\Messages\AssistantMessage;
+use Src\Messages\Type;
 use Src\Messages\UserMessage;
 use Src\Session;
 
@@ -22,21 +22,30 @@ class SessionWidget implements WidgetInterface
 {
     protected Session $session;
 
-    protected ChatWidget $sessionWidget;
+    protected ChatWidget $chatWidget;
     protected PromptWidget $promptWidget;
 
     public function __construct(
         protected Closure $draw,
-        Client $client
+        WrapperInterface $wrapper
     ) {
         $this->session = new Session();
 
-        $this->sessionWidget = new ChatWidget($draw, $this->session);
+        $this->chatWidget = new ChatWidget($draw, $this->session);
         $this->promptWidget = new PromptWidget(
             $draw,
-            executePrompt: function (Author $author, string $prompt) use ($client): void {
+            executePrompt: function (Type $type, string $prompt) use ($wrapper): void {
+                $previousMessages = $this->session->getMessages();
+
                 $this->session->appendMessage(new UserMessage($prompt));
-                $this->session->appendMessage(new ModelMessage($client, 'You are uni-code. A REALLY smart agent harnass', $prompt));
+
+                $this->session->appendMessage(
+                    new AssistantMessage(
+                        $wrapper,
+                        $prompt,
+                        $previousMessages
+                    )
+                );
             }
         );
     }
@@ -54,7 +63,7 @@ class SessionWidget implements WidgetInterface
                     ->padding(Padding::all(1))
                     ->borders(Borders::ALL)
                     ->borderType(BorderType::Rounded)
-                    ->widget($this->sessionWidget->toWidget($event)),
+                    ->widget($this->chatWidget->toWidget($event)),
                 BlockWidget::default()
                     ->padding(Padding::all(1))
                     ->borders(Borders::ALL)

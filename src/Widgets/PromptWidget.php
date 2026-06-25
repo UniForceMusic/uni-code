@@ -12,7 +12,8 @@ use PhpTui\Term\Terminal;
 use PhpTui\Tui\Extension\Core\Widget\ParagraphWidget;
 use PhpTui\Tui\Text\Text;
 use PhpTui\Tui\Widget\Widget;
-use Src\Author;
+use Src\Messages\Author;
+use Src\Messages\Type;
 
 class PromptWidget implements WidgetInterface
 {
@@ -39,7 +40,7 @@ class PromptWidget implements WidgetInterface
             }
 
             if ($event->code === KeyCode::Enter) {
-                ($this->executePrompt)(Author::User, $this->prompt);
+                ($this->executePrompt)(Type::User, $this->prompt);
 
                 $this->prompt = '';
             }
@@ -49,7 +50,7 @@ class PromptWidget implements WidgetInterface
             Text::parse(
                 sprintf(
                     '<fg=%s>%s</>',
-                    Author::User->color(),
+                    Type::User->color(),
                     $this->prompt
                 )
             )
